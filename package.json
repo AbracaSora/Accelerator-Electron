@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "@isaacs/cliui": "github:isaacs/cliui",
+    "axios": "^1.6.8",
+    "socket.io-client": "4.5.1",
     "vue": "^3.4.21",
-    "vue-panzoom": "^1.1.6"
+    "vue-panzoom": "^1.1.6",
+    "vue-socket.io": "^3.0.10",
+    "vue-websocket": "^0.2.3",
+    "vue3-websocket": "^1.0.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
