@@ -1,18 +1,8 @@
-# Vue 3 + TypeScript + Vite
+# Acceleartor
+## 当前前后端交互实现逻辑
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+前端每时刻向后端发送请求，后端接收请求立刻使用摄像头记录当前帧，然后使用模型对当前帧进行处理，得到结果后返回给前端,前端接收到结果后，根据结果进行相应的操作。
 
-## Recommended IDE Setup
+与之前的实现逻辑不同的是，之前的实现逻辑是前端拍摄图片后上传到后端，后端接收到图片后使用模型进行处理，得到结果后返回给前端，前端接收到结果后，根据结果进行相应的操作。
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support For `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+现在的逻辑的优点是不需要前端拍摄图片后上传到后端，减少了前后端交互的信息，提高了效率。

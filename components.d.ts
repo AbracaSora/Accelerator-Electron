@@ -10,7 +10,5 @@ declare module 'vue' {
     AButton: typeof import('ant-design-vue/es')['Button']
     AUpload: typeof import('ant-design-vue/es')['Upload']
     ImageViewer: typeof import('./src/components/ImageViewer.vue')['default']
-    PhotoViewer: typeof import('./src/components/PhotoViewer.vue')['default']
-    ZoomableImage: typeof import('./src/components/ZoomableImage.vue')['default']
   }
 }
