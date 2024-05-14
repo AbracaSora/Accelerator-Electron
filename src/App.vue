@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 // import { Capture,StartCamera } from './utils/Camera.ts';
-import type { uploadChangeParam } from 'ant-design-vue';
+import type { UploadChangeParam } from 'ant-design-vue';
 const files = ref<string[]>([]);
 const status = ref({
 	done: 0
 });
-const handleChange = (info: uploadChangeParam) => {
+const handleChange = (info: UploadChangeParam) => {
 	if (info.file.status !== 'done') {
-		return;
+		return;U
 	}
 	const xhr = new XMLHttpRequest();
 	xhr.open('GET', 'http://localhost:5000/imageList');
