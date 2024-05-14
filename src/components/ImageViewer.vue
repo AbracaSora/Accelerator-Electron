@@ -1,47 +1,49 @@
 <template>
-    <div class="image-viewer" v-viewer @inited="inited">
-        <img v-if="flag" class="preview-box" v-for="src in props.imageUrl" :src="src"/>
-    </div>
+    <viewer class="image-viewer" @inited="inited">
+        <img class="preview-box" v-for="src in props.imageUrl" :src="src"/>
+    </viewer>
 </template>
 
 <script setup lang="ts">
-// import Viewer from 'viewerjs';
+import emitter from '../libs/eventbus.ts';
+import { onBeforeMount, onMounted } from 'vue';
 
 
 let $viewer : Viewer;
 
 const inited = (viewer: Viewer) => {
+    console.log(viewer);
     $viewer = viewer;
+    emitter.on('放大', zoomIn);
+    emitter.on('缩小', zoomOut);
+    emitter.on('向后翻页', Next);
+    emitter.on('向前翻页', Prev);
 }
 const zoomIn = () => {
     $viewer.zoom(0.1);
+}
+const zoomOut = () => {
+    $viewer.zoom(-0.1);
 }
 const Next = () => {
     $viewer.next(true);
 }
 const Prev = () => {
+    console.log($viewer);
     $viewer.prev(true);
 }
 interface Props {
     imageUrl: string[];
 }
-let flag = true;
 const props = defineProps<Props>();
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Space') {
-        flag = !flag;
-    }
+onMounted(() => {
+    
 });
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') {
-        Next();
-    } else if (e.key === 'ArrowLeft') {
-        Prev();
-    } else if (e.key === 'ArrowUp') {
-        zoomIn();
-    } else if (e.key === 'ArrowDown') {
-        $viewer.zoom(-0.1);
-    }
+onBeforeMount(() => {
+    emitter.off('放大');
+    emitter.off('缩小');
+    emitter.off('向后翻页');
+    emitter.off('向前翻页');
 });
 </script>
 

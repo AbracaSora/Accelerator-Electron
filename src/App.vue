@@ -1,75 +1,91 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-// import { Capture,StartCamera } from './utils/Camera.ts';
-import type { UploadChangeParam } from 'ant-design-vue';
-const files = ref<string[]>([]);
-const status = ref({
-	done: 0
-});
-const handleChange = (info: UploadChangeParam) => {
-	if (info.file.status !== 'done') {
-		return;U
-	}
-	const xhr = new XMLHttpRequest();
-	xhr.open('GET', 'http://localhost:5000/imageList');
-	xhr.send();
-	xhr.responseType = 'json';
-	xhr.onload = () => {
-		if (xhr.status === 200) {
-			files.value = [];
-			const response = xhr.response;
-			console.log(response.image_list[0]);
-			for (let i = 0; i < response.length; i++) {
-				files.value.push('http://localhost:5000/image/' + response.image_list[i]);
-				console.log(files.value);
-			}
-			status.value.done = 1;
-		}
-	};
-};
-const size = ref<number>(0);
-
-async function AppendDataset(): Promise<void> {
-	const xhr = new XMLHttpRequest();
-	xhr.open('POST', 'http://localhost:5000/Camera');
-	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify({ isDataset: true }));
-	xhr.responseType = 'json';
-	xhr.onload = () => {
-		if (xhr.status === 200) {
-			console.log('Dataset Appended');
-			size.value = xhr.response.size;
-		}
-	};
+import axios from 'axios';   
+import { type UploadChangeParam } from 'ant-design-vue';
+import emitter from './libs/eventbus';
+enum Status {
+	INIT = 0,
+	START = 1,
+	RUNNING = 2,
+	TRAINING = 3,
 }
+const status = ref<Status>(Status.INIT);
+const files = ref<string[]>([]);
+const onUpload = (info: UploadChangeParam) => {
+	if (info.file.status !== 'done') {
+		return;
+	}
+	axios.get('http://localhost:5000/imageList').then((response:any) => {
+		files.value = [];
+		console.log(response);
+		for (let i = 0; i < response.data.image_list.length; i++) {
+			files.value.push('http://localhost:5000/image/' + response.data.image_list[i]);
+		}
+		status.value = Status.START;
+	});
+};
+const DataSize = ref<number>(0);
+
 async function Start(): Promise<void> {
-	const xhr = new XMLHttpRequest();
-	xhr.open('POST', 'http://localhost:5000/Camera');
-	xhr.setRequestHeader('Content-Type', 'application/json');
-	xhr.send(JSON.stringify({ isDataset: false }));
-	xhr.responseType = 'json';
-	xhr.onload = () => {
-		if (xhr.status === 200) {
-			const response = xhr.response;
-			console.log(response);
-			size.value = response.size;
+	const response = await axios.post('http://localhost:5000/Camera', { isDataset: false });
+	if (response.status === 200) {
+		console.log(response.data.action);
+		emitter.emit(response.data.action);
+		Start();
+	}
+}
+
+function RunningSkipTraining() {
+	axios.get('http://localhost:5000/LoadModel').then((response:any) => {
+		if (response.status === 200) {
+			status.value = Status.RUNNING;
 			Start();
 		}
-	};
+	})
+}
+
+function RunningWithTraining() {
+	status.value = Status.TRAINING;
+}
+const Message = ref<string>('Please press Space to start training');
+
+function Train() {      
+	axios.post('http://localhost:5000/Train').then((response:any) => {
+		if (response.status === 200) {
+			DataSize.value = response.data.size;
+		}
+		if (response.data.size === 20) {
+			status.value = Status.RUNNING;
+			Start();
+		}
+	});
+}
+document.onkeyup = function (event) {
+	if (event.key === ' ') {
+		if (status.value === Status.TRAINING) {
+			Train();
+		}
+	}
 }
 </script>
 
 <template>
-	<template v-if="status.done === 0">
-		<a-upload action="http://localhost:5000/upload" @change="handleChange" directory>
+	<template v-if="status === Status.INIT">
+		<a-upload action="http://localhost:5000/upload" @change="onUpload" directory>
 			<a-button type="primary">Upload Directory</a-button>
 		</a-upload>
 	</template>
-	<div v-else>
+	<template v-else-if="status === Status.START">
+		<a-button @click="RunningSkipTraining">使用默认数据集</a-button>
+		<a-button @click="RunningWithTraining">使用自定义数据集</a-button>
+	</template>
+	<template v-else-if="status === Status.TRAINING">
+		<a-progress :percent="DataSize * 5" />	
+		<p>{{ Message }}</p>
+	</template>
+	<template v-else-if="status === Status.RUNNING">
 		<ImageViewer :imageUrl="files"></ImageViewer>
-		<a-button @click="AppendDataset" type="primary">AppendDataset</a-button>
-		<a-button @click="Start" type="primary">Start</a-button>
-	</div>
+	</template>
 </template>
 
 <style scoped></style>
