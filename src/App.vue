@@ -15,30 +15,30 @@ const onUpload = (info: UploadChangeParam) => {
 	if (info.file.status !== 'done') {
 		return;
 	}
-	axios.get('http://localhost:5000/imageList').then((response:any) => {
-		files.value = [];
-		console.log(response);
-		for (let i = 0; i < response.data.image_list.length; i++) {
-			files.value.push('http://localhost:5000/image/' + response.data.image_list[i]);
-		}
-		status.value = Status.START;
-	});
+	status.value = Status.START;
 };
 const DataSize = ref<number>(0);
-
-async function Start(): Promise<void> {
-	const response = await axios.post('http://localhost:5000/Camera', { isDataset: false });
-	if (response.status === 200) {
-		console.log(response.data.action);
-		emitter.emit(response.data.action);
-		Start();
-	}
+const position = ref<{ x: number, y: number }>({ x: 0, y: 0 });
+function Start(): void {
+	axios.post('http://localhost:5000/Camera', { isDataset: false }).then((response:any) => {
+		if (response.status === 200) {
+			position.value = response.data.position;
+			emitter.emit(response.data.action);
+			Start();
+		}
+	});
 }
 
 function RunningSkipTraining() {
 	axios.get('http://localhost:5000/LoadModel').then((response:any) => {
 		if (response.status === 200) {
 			status.value = Status.RUNNING;
+			axios.get('http://localhost:5000/imageList').then((response:any) => {
+				files.value = [];
+				for (let i = 0; i < response.data.image_list.length; i++) {
+					files.value.push('http://localhost:5000/image/' + response.data.image_list[i]);
+				}
+			});
 			Start();
 		}
 	})
@@ -54,8 +54,15 @@ function Train() {
 		if (response.status === 200) {
 			DataSize.value = response.data.size;
 		}
-		if (response.data.size === 20) {
+		if (response.data.isTrained) {
 			status.value = Status.RUNNING;
+			axios.get('http://localhost:5000/imageList').then((response:any) => {
+				files.value = [];
+				console.log(response);
+				for (let i = 0; i < response.data.image_list.length; i++) {
+					files.value.push('http://localhost:5000/image/' + response.data.image_list[i]);
+				}
+			});
 			Start();
 		}
 	});
@@ -85,7 +92,20 @@ document.onkeyup = function (event) {
 	</template>
 	<template v-else-if="status === Status.RUNNING">
 		<ImageViewer :imageUrl="files"></ImageViewer>
+		<div id="target" :style="{left: position.x + '%', top: position.y + '%'}"></div>
 	</template>
 </template>
 
-<style scoped></style>
+<style scoped>
+#target {
+	background-color: rgba(144, 238, 144, 0.8);
+	position: absolute;
+	border-radius: 50%;
+	height: 40px;
+	width: 40px;
+	transition: all 0.1s ease;
+	box-shadow: 0 0 20px 10px white;
+	border: 4px solid rgba(0, 0, 0, 0.5);
+	z-index: 2016;
+}
+</style>

@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@isaacs/cliui": "github:isaacs/cliui",
+    "@types/jquery": "^3.5.30",
     "axios": "^1.6.8",
+    "jquery": "^3.7.1",
     "mitt": "^3.0.1",
     "socket.io-client": "4.5.1",
     "vue": "^3.4.21",

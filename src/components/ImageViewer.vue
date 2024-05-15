@@ -1,5 +1,5 @@
 <template>
-    <viewer class="image-viewer" @inited="inited">
+    <viewer @inited="inited">
         <img class="preview-box" v-for="src in props.imageUrl" :src="src"/>
     </viewer>
 </template>
@@ -12,12 +12,7 @@ import { onBeforeMount, onMounted } from 'vue';
 let $viewer : Viewer;
 
 const inited = (viewer: Viewer) => {
-    console.log(viewer);
     $viewer = viewer;
-    emitter.on('放大', zoomIn);
-    emitter.on('缩小', zoomOut);
-    emitter.on('向后翻页', Next);
-    emitter.on('向前翻页', Prev);
 }
 const zoomIn = () => {
     $viewer.zoom(0.1);
@@ -37,7 +32,10 @@ interface Props {
 }
 const props = defineProps<Props>();
 onMounted(() => {
-    
+    emitter.on('放大', zoomIn);
+    emitter.on('缩小', zoomOut);
+    emitter.on('向后翻页', Next);
+    emitter.on('向前翻页', Prev);
 });
 onBeforeMount(() => {
     emitter.off('放大');
