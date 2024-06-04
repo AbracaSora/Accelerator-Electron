@@ -37,8 +37,19 @@ function Start(): void {
 				let x = response.data.position.x, y = response.data.position.y; // 获取位置
 				let dx = x - position.value.x, dy = y - position.value.y; // 计算位移
 				// 将当前位置向目标位置移动80%的距离
-				position.value = { x: position.value.x + dx * 0.8, y: position.value.y + dy * 0.8 };
-				emitter.emit(response.data.action);
+				position.value = { 
+					x: position.value.x + dx * 0.8, 
+					y: position.value.y + dy * 0.8 
+				};
+				let frame = response.data.frame;
+				let canvas = document.createElement('canvas');
+				canvas.width = frame.width;
+				canvas.height = frame.height;
+				let ctx = canvas.getContext('2d');
+				ctx!.putImageData(frame, 0, 0);
+				let img = document.getElementById('Camera') as HTMLImageElement;
+				img.src = canvas.toDataURL();
+				emitter.emit(response.data.action)
 			}
 		});
 	}, 500); // 500ms
@@ -89,6 +100,7 @@ document.onkeyup = function (event) {
 </script>
 
 <template>
+	<HtmlToCanvas></HtmlToCanvas>
 	<template v-if="status === Status.INIT"> <!-- 初始化状态 -->
 		<h1>基于智能控制的无接触医学图像浏览系统</h1>
 		<a-upload action="http://localhost:5000/upload" @change="onUpload" directory>
@@ -106,6 +118,7 @@ document.onkeyup = function (event) {
 	<template v-else-if="status === Status.RUNNING"> <!-- 运行状态 -->
 		<ImageViewer :imageUrl="files"></ImageViewer>
 		<div id="target" :style="{left: position.x + '%', top: position.y + '%'}">
+		<img id="Camera"></img>
 		</div> <!-- 渲染注视点标记 -->
 	</template>
 </template>

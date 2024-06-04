@@ -8,8 +8,10 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AButton: typeof import('ant-design-vue/es')['Button']
+    AImage: typeof import('ant-design-vue/es')['Image']
     AProgress: typeof import('ant-design-vue/es')['Progress']
     AUpload: typeof import('ant-design-vue/es')['Upload']
+    HtmlToCanvas: typeof import('./src/components/HtmlToCanvas.vue')['default']
     ImageViewer: typeof import('./src/components/ImageViewer.vue')['default']
   }
 }
