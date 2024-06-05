@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeMount,onMounted,toRef,defineProps } from "vue";
+import { onBeforeMount,onMounted,toRef } from "vue";
 import html2canvas from "html2canvas";
 import emitter from "../libs/eventbus";
 import axios from 'axios';
@@ -62,7 +62,10 @@ const Save = async () => {
     let imgBlobData: any = ''
     imgBlobData = await convertToImage(document.body);
     imgUrl.value = imgBlobData
-    axios.post('http://localhost:5000/SaveImage', { imgBlobData }).then((response: any) => {
+    axios.post('http://localhost:5000/SaveImage', { 
+        img : imgBlobData,
+        position: props.Position 
+    }).then((response: any) => {
         if (response.status === 200) {
             console.log('保存成功')
         }
