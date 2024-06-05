@@ -10,8 +10,8 @@ const createWindow = () => {
       contextIsolation: false
     },
     resizable: false,
-    width: 800,
-    height: 600
+    width: 2560,
+    height: 1440
   });
   win.loadURL("http://localhost:5173");
 };

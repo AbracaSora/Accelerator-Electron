@@ -18,8 +18,8 @@ const createWindow = () => {
       contextIsolation: false,
     },
     resizable: false,
-    width: 800,
-    height: 600,
+    width: 2560,
+    height: 1440,
   })
     // 集成网页和 Node.js 后，需要加载
     // 这里接收的网址是指：Vite 启动后，会在本地运行一个服务，把这个服务网址丢进去就行

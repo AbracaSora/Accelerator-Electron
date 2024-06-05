@@ -60,6 +60,7 @@ const Identify = async () => {
     }).then((response: any) => {
         if (response.status === 200) {
             console.log('保存成功');
+            console.log(response.data);
             Message.value = response.data;
         }
     });

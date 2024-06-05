@@ -1,16 +1,30 @@
 <template>
     <template v-if="props.imageUrl.length"> <!--在图片加载完成后显示-->
-        <viewer class="viewer" @inited="inited">
-            <img class="preview-box" v-for="src in props.imageUrl" :src="src" :key="src"/>
+        <viewer class="viewer" @inited="inited" :options="options">
+            <img class="preview-box" v-for="src in props.imageUrl" :src="src" :key="src" />
         </viewer>
     </template>
-</template> 
+</template>
 
 <script setup lang="ts">
 import emitter from '../libs/eventbus.ts';
-import { onBeforeMount, onMounted } from 'vue';
-
-let $viewer : Viewer;
+import { onBeforeMount, onMounted,ref } from 'vue';
+const options = ref({
+    inline: false,
+    button: false,
+    navbar: false,
+    title: false,
+    toolbar: false,
+    tooltip: true,
+    movable: true,
+    zoomable: true,
+    rotatable: true,
+    scalable: true,
+    transition: true,
+    fullscreen: true,
+    keyboard: true,
+})
+let $viewer: Viewer;
 // 初始化viewer
 const inited = (viewer: Viewer) => {
     $viewer = viewer;

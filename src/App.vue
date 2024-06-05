@@ -139,11 +139,13 @@ document.onkeyup = function (event) {
 	height: auto;
 	max-width: 30%;
 	max-height: 30%;
+	z-index: 2018;
 }
 
 /* 描述文字 */
 #canvas {
-	z-index: 2077;
+	position: absolute;
+	z-index: 2017;
 	color: rgb(255, 0, 0);
 }
 </style>
