@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { onBeforeMount,onMounted,toRef } from "vue";
+import { onBeforeMount,onMounted,ref } from "vue";
 import html2canvas from "html2canvas";
 import emitter from "../libs/eventbus";
 import axios from 'axios';
-
-interface Props {
-    Position: { x: number, y: number };
-}
-const props = defineProps<Props>();
 onBeforeMount(() => {
-    emitter.off('查询');
+    emitter.off('识别');
 });
 onMounted(() => {
-    emitter.on('查询', Save);
+    emitter.on('识别', Save);
 });
-let imgUrl: any = toRef('')
+const Message = ref<string>('');
+let imgUrl = ref<string>('')
 // 生成快照
 const convertToImage = (container: any, options?: any):Promise<any> => {
     // 设置放大倍数
@@ -27,10 +23,7 @@ const convertToImage = (container: any, options?: any):Promise<any> => {
         let { width, height } = options;
         width = width || _width;
         height = height || _height;
-
     }
-
-
     // html2canvas配置项
     const ops = {
         scale,
@@ -59,22 +52,22 @@ const convertToImage = (container: any, options?: any):Promise<any> => {
     });
 }
 const Save = async () => {
-    let imgBlobData: any = ''
+    let imgBlobData: any = '';
     imgBlobData = await convertToImage(document.body);
-    imgUrl.value = imgBlobData
+    imgUrl.value = imgBlobData;
     axios.post('http://localhost:5000/SaveImage', { 
         img : imgBlobData,
-        position: props.Position 
     }).then((response: any) => {
         if (response.status === 200) {
-            console.log('保存成功')
+            console.log('保存成功');
+            Message.value = response.data;
         }
     })
 }
 </script>
 <template>
     <div class="contrainer">
-        <a-button class="btn" size="large" @click="Save">整个网页截图</a-button>
+        {{ Message }}
     </div>
 </template>
 <style>

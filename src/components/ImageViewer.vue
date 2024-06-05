@@ -14,6 +14,7 @@ let $viewer : Viewer;
 // 初始化viewer
 const inited = (viewer: Viewer) => {
     $viewer = viewer;
+    $viewer.view(0);
 }
 // TODO: 添加其他功能,并对应一种操作手势
 // 放大
@@ -54,8 +55,8 @@ onBeforeMount(() => {
 
 <style scoped>
 .preview-box {
-    width: 350px;
-    height: 350px;
+    width: 250px;
+    height: 250px;
     object-fit: contain;
 }
 </style>
