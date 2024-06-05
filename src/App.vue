@@ -8,26 +8,27 @@ enum Status {
 	RUNNING = 2,
 	TRAINING = 3,
 } // 状态
-const status = ref<Status>(Status.INIT);
+const status = ref<Status>(Status.INIT); 
 const files = ref<string[]>([]);
 const DataSize = ref<number>(0);
 const position = ref<{ x: number, y: number }>({ x: 0, y: 0 });
 // 开始运行
-// TODO: 优化注视点标记的移动效果
 function Start(): void {
 	axios.post('http://localhost:5000/Camera', { isDataset: false }).then((response: any) => {
 		if (response.status === 200) {
-			position.value = response.data.position;
-			emitter.emit(response.data.action);
-			const videoFrameData = response.data.frame;
+			position.value = response.data.position; // 注视点位置
+			emitter.emit(response.data.action); // 发送事件
+			const videoFrameData = response.data.frame; // 视频帧数据
 			const videoFrameElement = document.getElementById("videoFrame") as HTMLVideoElement;
-			videoFrameElement.src = `data:image/jpeg;base64, ${videoFrameData}`;
+			videoFrameElement.src = `data:image/jpeg;base64, ${videoFrameData}`; // 设置视频帧
 			Start();
 		}
 	});
 }
 
+// 使用已保存模型
 function RunningSkipTraining() {
+	// 加载模型
 	axios.get('http://localhost:5000/LoadModel').then((response: any) => {
 		if (response.status === 200) {
 			status.value = Status.RUNNING;
@@ -41,8 +42,6 @@ function RunningSkipTraining() {
 		}
 	})
 }
-const Message = ref<string>('1.请视线跟随鼠标，不连续地按下空格，直到进度条达到100%。\n2.按下空格时鼠标的位置尽量分散，更有利于视线追踪模型的准确性。');
-
 // 训练
 function Train() {
 	axios.post('http://localhost:5000/Train').then((response: any) => {
@@ -83,7 +82,6 @@ document.onkeyup = function (event) {
 			2.请先选择图片进行上传，然后单击“Start”按钮，即可开始使用系统。<br>
 			3.建议在光线适宜、人像清晰的摄像环境下使用本系统。<br>
 		</p>
-
 		<p style="text-align: left;margin-top: 20px;white-space: pre-line;">
 			图片浏览时支持的手势操作：<br>
 			向前切换图片：拇指张开，其余四指向上<br>
@@ -92,11 +90,10 @@ document.onkeyup = function (event) {
 			缩小图片：拇指与食指保持较小间距<br>
 			对注视部分的识别：食指与中指向上，其他手指折回<br>
 		</p>
-
 	</template>
 	<template v-else-if="status === Status.START"> <!-- 开始状态 -->
-		<a-button @click="RunningSkipTraining">使用默认数据集</a-button>
-		<a-button @click="status = Status.TRAINING">使用自定义数据集</a-button>
+		<a-button @click="RunningSkipTraining">使用已保存模型</a-button>
+		<a-button @click="status = Status.TRAINING">进行模型训练</a-button>
 		<p>
 			1.若选择“使用已保存模型”，将会使用您上一次选择“进行模型训练”时得到的模型。<br>
 			2.若选择“进行模型训练”，将会重新收集您的视线数据，训练新的模型。
@@ -104,20 +101,23 @@ document.onkeyup = function (event) {
 	</template>
 	<template v-else-if="status === Status.TRAINING"> <!-- 训练状态 -->
 		<a-progress :percent="DataSize * 5" /> <!-- 训练进度 -->
-		<p style="white-space: pre-line;">{{ Message }}</p>
+		<p style="white-space: pre-line;">
+			1.请视线跟随鼠标，不连续地按下空格，直到进度条达到100%。<br>
+			2.按下空格时鼠标的位置尽量分散，更有利于视线追踪模型的准确性。
+		</p>
 	</template>
 	<template v-else-if="status === Status.RUNNING"> <!-- 运行状态 -->
-		<ImageViewer :imageUrl="files"></ImageViewer>
+		<ImageViewer :imageUrl="files"></ImageViewer> <!-- 图片浏览 -->
 		<div id="target" :style="{ left: position.x + '%', top: position.y + '%' }">
-			<img id="Camera"></img>
 		</div> <!-- 渲染注视点标记 -->
+		<img id="Camera"></img>  <!-- 渲染摄像头 -->
 		<HtmlToCanvas id="canvas"></HtmlToCanvas>
 		<img id="videoFrame" :Position="position"></img> <!-- 渲染视频流 -->
-
 	</template>
 </template>
 
 <style scoped>
+/* 注视点样式 */
 #target {
 	background-color: rgba(144, 238, 144, 0);
 	position: absolute;
@@ -130,7 +130,7 @@ document.onkeyup = function (event) {
 	z-index: 2016;
 }
 
-/* 注视点样式 */
+/* 视频流样式 */
 #videoFrame {
 	position: absolute;
 	top: 0;
@@ -141,8 +141,9 @@ document.onkeyup = function (event) {
 	max-height: 30%;
 }
 
+/* 描述文字 */
 #canvas {
-	z-index: 2015;
-	color: aqua;
+	z-index: 2077;
+	color: rgb(255, 0, 0);
 }
 </style>

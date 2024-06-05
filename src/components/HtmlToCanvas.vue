@@ -7,7 +7,7 @@ onBeforeMount(() => {
     emitter.off('识别');
 });
 onMounted(() => {
-    emitter.on('识别', Save);
+    emitter.on('识别', Identify);
 });
 const Message = ref<string>('');
 let imgUrl = ref<string>('')
@@ -51,18 +51,18 @@ const convertToImage = (container: any, options?: any):Promise<any> => {
         });
     });
 }
-const Save = async () => {
+const Identify = async () => {
     let imgBlobData: any = '';
     imgBlobData = await convertToImage(document.body);
     imgUrl.value = imgBlobData;
-    axios.post('http://localhost:5000/SaveImage', { 
+    axios.post('http://localhost:5000/Identify', { 
         img : imgBlobData,
     }).then((response: any) => {
         if (response.status === 200) {
             console.log('保存成功');
             Message.value = response.data;
         }
-    })
+    });
 }
 </script>
 <template>
